@@ -10,6 +10,7 @@ pub mod freeze_account;
 pub mod unfreeze_account;
 pub mod remove_money;
 pub mod set_money;
+pub mod pay;
 
 pub fn register_commands(context: &Context) {
     info!("Registering Commands...");
@@ -33,6 +34,26 @@ pub fn register_commands(context: &Context) {
     context.register_command(balance::balance_command(), balance_permission.node.as_str());
     info!("Registered balance command");
 
+    info!("Registering pay command permission...");
+    let pay_permission = Permission {
+        node: PERMISSION_BASE.to_string() + "pay",
+        description: "Allow users to pay other players".to_string(),
+        default: PermissionDefault::Allow,
+        children: vec![],
+    };
+    match context.register_permission(&pay_permission) {
+        Ok(_) => (),
+        Err(e) => {
+            error!("Failed to register pay permission: {}", e);
+            return;
+        }
+    }
+    info!("Registered pay command permission");
+    info!("Registering pay command...");
+    context.register_command(pay::pay_command(), pay_permission.node.as_str());
+    info!("Registered pay command");
+
+    info!("Registering Economy Admin commands...");
     let names = ["economy".to_string(), "eco".to_string()];
     let cmd = Command::new(&names, "ConcelareEconomy Plugin for Pumpkin");
 
@@ -55,4 +76,6 @@ pub fn register_commands(context: &Context) {
     };
 
     context.register_command(cmd, permission.node.as_str());
+    info!("Registered Economy Admin commands");
+    info!("Registered Commands!");
 }
