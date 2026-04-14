@@ -86,7 +86,7 @@ impl CommandHandler for BalanceCommandExecutor {
             }
         };
 
-        let message = TextComponent::text("Your Balance: ".to_string().as_str());
+        let message = TextComponent::text("Your Balance: $".to_string().as_str());
         message.color_named(NamedColor::Green);
         message.bold(true);
 

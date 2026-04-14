@@ -11,6 +11,7 @@ pub mod unfreeze_account;
 pub mod remove_money;
 pub mod set_money;
 pub mod pay;
+pub mod log;
 
 pub fn register_commands(context: &Context) {
     info!("Registering Commands...");
@@ -62,6 +63,7 @@ pub fn register_commands(context: &Context) {
     unfreeze_account::unfreeze_command(&cmd);
     remove_money::remove_money_command(&cmd);
     set_money::set_money_command(&cmd);
+    log::log_command(&cmd);
 
     let permission = Permission {
         node: PERMISSION_BASE.to_string() + "Admin",

@@ -1,11 +1,13 @@
 use std::str::FromStr;
+use chrono::Utc;
 use pumpkin_plugin_api::command::{Command, CommandError, CommandNode};
 use pumpkin_plugin_api::command_wit::{Arg, ArgumentType, Number};
 use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::text::{NamedColor, TextComponent};
 use tracing::error;
 use uuid::Uuid;
-use crate::services::database;
+use crate::models::transaction::Transaction;
+use crate::services::{database, transaction};
 use crate::util::numbers::format_money;
 
 pub fn pay_command() -> Command {
@@ -34,6 +36,7 @@ impl CommandHandler for PayCommandExecutor {
         args: pumpkin_plugin_api::command::ConsumedArgs,
     ) -> pumpkin_plugin_api::Result<i32, CommandError> {
         let db = database::get_database();
+        let transaction_log = transaction::TRANSACTIONS.get().unwrap();
 
         if let Arg::Players(players) = args.get_value("player") {
             for player in players {
@@ -116,6 +119,22 @@ impl CommandHandler for PayCommandExecutor {
                         return Ok(0);
                     }
                 }
+
+                let log = Transaction {
+                    id: Uuid::now_v7(),
+                    sender: sender_uuid,
+                    receiver: target_uuid,
+                    amount,
+                    timestamp: Utc::now(),
+                };
+
+                match transaction_log.log_transaction(&log) {
+                    Ok(_) => (),
+                    Err(e) => {
+                        error!("Error logging transaction: {}", e);
+                        return Ok(0);
+                    }
+                };
 
                 let msg = TextComponent::text(&format!("You have paid ${} to {}", format_money(amount), player.get_name()));
                 msg.color_named(NamedColor::Green);

@@ -33,13 +33,21 @@ impl Plugin for EconomyPlugin {
         info!("Loading Concelare Economy plugin...");
 
         let db_path = PathBuf::from(_context.get_data_folder()).join("economy.db");
+        let log_path = PathBuf::from(_context.get_data_folder()).join("economy.log");
         if !db_path.exists() {
             let _ = std::fs::File::create(&db_path);
             info!("Created economy database at {}", db_path.to_str().unwrap());
         }
 
+        if !log_path.exists() {
+            let _ = std::fs::File::create(&log_path);
+            info!("Created economy transaction log at {}", log_path.to_str().unwrap());
+        }
+
         let _db = services::database::DatabaseService::new(db_path.to_str().unwrap())?;
         info!("Connected to economy database");
+        let _transaction_service = services::transaction::TransactionService::new(log_path.to_str().unwrap());
+        info!("Initialized transaction service");
         _context.register_event_handler(OnJoinEvent { db: _db.clone() }, EventPriority::Highest, false)?;
         info!("Registered OnJoinEvent handler");
         register_commands(&_context);
