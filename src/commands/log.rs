@@ -30,7 +30,7 @@ impl CommandHandler for LogCommandExecutor {
                 let player_uuid = Uuid::from_str(player.get_id().as_str()).unwrap();
                 let logs = match transaction_service.search_by_participant(player_uuid) {
                     Ok(logs) => logs,
-                    Err(err) => {
+                    Err(_) => {
                         let msg = TextComponent::text("Unable to fetch logs");
                         msg.color_named(NamedColor::DarkRed);
                         sender.send_message(msg);
@@ -59,7 +59,7 @@ impl CommandHandler for LogCommandExecutor {
 
         let logs = match transaction_service.read_all() {
             Ok(logs) => logs,
-            Err(err) => {
+            Err(_) => {
                 let msg = TextComponent::text("Unable to fetch logs");
                 msg.color_named(NamedColor::DarkRed);
                 sender.send_message(msg);
