@@ -1,5 +1,4 @@
 use uuid::Uuid;
-
 use crate::models::player::ConcelarePlayer;
 
 pub trait PlayerRepository: Send + Sync {

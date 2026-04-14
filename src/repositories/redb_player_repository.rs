@@ -1,10 +1,8 @@
 use std::sync::Mutex;
-
 use chrono::Utc;
 use redb::{Database, ReadableDatabase, TableDefinition};
 use tracing::error;
 use uuid::Uuid;
-
 use crate::models::player::ConcelarePlayer;
 use crate::repositories::player_repository::PlayerRepository;
 
