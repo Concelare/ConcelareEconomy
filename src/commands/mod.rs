@@ -12,6 +12,7 @@ pub mod remove_money;
 pub mod set_money;
 pub mod pay;
 pub mod log;
+pub mod revert;
 
 pub fn register_commands(context: &Context) {
     info!("Registering Commands...");
@@ -64,6 +65,7 @@ pub fn register_commands(context: &Context) {
     remove_money::remove_money_command(&cmd);
     set_money::set_money_command(&cmd);
     log::log_command(&cmd);
+    revert::revert_command(&cmd);
 
     let permission = Permission {
         node: PERMISSION_BASE.to_string() + "Admin",

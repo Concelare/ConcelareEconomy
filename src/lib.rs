@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::sync::Arc;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use pumpkin_plugin_api::events::EventPriority;
 use tracing::*;
@@ -46,7 +47,7 @@ impl Plugin for EconomyPlugin {
 
         let _db = services::database::DatabaseService::new(db_path.to_str().unwrap())?;
         info!("Connected to economy database");
-        let _transaction_service = services::transaction::TransactionService::new(log_path.to_str().unwrap());
+        let _transaction_service = services::transaction::TransactionService::new(log_path.to_str().unwrap(), Arc::new(_db.clone()));
         info!("Initialized transaction service");
         _context.register_event_handler(OnJoinEvent { db: _db.clone() }, EventPriority::Highest, false)?;
         info!("Registered OnJoinEvent handler");

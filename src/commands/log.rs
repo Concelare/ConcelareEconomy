@@ -47,6 +47,8 @@ impl CommandHandler for LogCommandExecutor {
                 for log in logs {
                     let msg = TextComponent::text(&format!("{}: ${} - From {} to {}", log.timestamp.format("%Y-%m-%d %H:%M:%S"), log.amount,server.get_player_by_uuid(log.sender.as_simple().to_string().as_str()).unwrap().get_name(), server.get_player_by_uuid(log.receiver.as_simple().to_string().as_str()).unwrap().get_name()));
                     msg.color_named(NamedColor::White);
+                    msg.click_copy_to_clipboard(log.id.to_string().as_str());
+                    msg.hover_show_text(TextComponent::text(format!("Click to copy transaction ID: {}", log.id).as_str()));
                     sender.send_message(msg);
                     i += 1;
                     if i == 20 {
@@ -75,6 +77,8 @@ impl CommandHandler for LogCommandExecutor {
         for log in logs {
             let msg = TextComponent::text(&format!("{}: ${} - From {} to {}", log.timestamp.format("%Y-%m-%d %H:%M:%S"), log.amount,server.get_player_by_uuid(log.sender.as_simple().to_string().as_str()).unwrap().get_name(), server.get_player_by_uuid(log.receiver.as_simple().to_string().as_str()).unwrap().get_name()));
             msg.color_named(NamedColor::White);
+            msg.click_copy_to_clipboard(log.id.to_string().as_str());
+            msg.hover_show_text(TextComponent::text(format!("Click to copy transaction ID: {}", log.id).as_str()));
             sender.send_message(msg);
             i += 1;
             if i == 20 {

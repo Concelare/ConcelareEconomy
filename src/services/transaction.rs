@@ -6,18 +6,21 @@ use tracing::{info, warn};
 use uuid::Uuid;
 
 use crate::models::transaction::Transaction;
+use crate::services::database::DatabaseService;
 
 pub static TRANSACTIONS: OnceLock<Arc<TransactionService>> = OnceLock::new();
 
 #[derive(Clone)]
 pub struct TransactionService {
     file_path: PathBuf,
+    db: Arc<DatabaseService>,
 }
 
 impl TransactionService {
-    pub fn new(file_path: &str) -> Self {
+    pub fn new(file_path: &str, database_service: Arc<DatabaseService>) -> Self {
         let instance = Self {
             file_path: PathBuf::from(file_path),
+            db: database_service,
         };
 
         let _ = TRANSACTIONS.set(Arc::new(instance.clone()));
@@ -97,5 +100,57 @@ impl TransactionService {
             .into_iter()
             .filter(|tx| tx.sender == player || tx.receiver == player)
             .collect())
+    }
+
+    pub fn revert_transaction(&self, transaction_id: Uuid) -> std::io::Result<()> {
+        let transaction = self.search_by_id(transaction_id)?;
+        if let Some(transaction) = transaction {
+            match self.db.players.remove_money(transaction.receiver, transaction.amount) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Error removing sender balance: {}", e);
+                    return Ok(());
+                }
+            };
+            match self.db.players.add_money(transaction.sender, transaction.amount) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Error adding receiver balance: {}", e);
+                    return Ok(());
+                }
+            };
+
+
+            match self.delete_transaction(transaction.id) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Error deleting transaction: {}", e);
+                    return Ok(());
+                }
+            };
+
+            info!("Reverted transaction {}", transaction.id);
+        }
+
+        Ok(())
+    }
+
+    pub fn delete_transaction(&self, transaction_id: Uuid) -> std::io::Result<()> {
+        let mut transactions = self.read_all()?;
+        transactions.retain(|tx| tx.id != transaction_id);
+
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&self.file_path)?;
+
+        for transaction in transactions {
+            let json = serde_json::to_string(&transaction)
+                .map_err(|err| std::io::Error::new(std::io::ErrorKind::InvalidData, err))?;
+            writeln!(file, "{json}")?;
+            info!("Logged transaction {}", transaction.id);
+        }
+        Ok(())
     }
 }
