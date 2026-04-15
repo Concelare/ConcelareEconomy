@@ -51,6 +51,8 @@ impl Plugin for EconomyPlugin {
         info!("Initialized transaction service");
         _context.register_event_handler(OnJoinEvent { db: _db.clone() }, EventPriority::Highest, false)?;
         info!("Registered OnJoinEvent handler");
+        _context.register_event_handler(events::on_leave::OnLeaveEvent { db: _db.clone() }, EventPriority::Highest, false)?;
+        info!("Registered OnLeaveEvent handler");
         register_commands(&_context);
         info!("Completed Loading Concelare Economy plugin.");
         Ok(())
