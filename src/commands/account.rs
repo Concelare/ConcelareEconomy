@@ -37,7 +37,7 @@ impl CommandHandler for AccountCommandExecutor {
                         sender.send_message(msg);
                         return Ok(1);
                     },
-                    Err(err) => {
+                    Err(_err) => {
                         let error_msg = TextComponent::text("Failed to retrieve player information");
                         error_msg.color_named(NamedColor::DarkRed);
                         error_msg.bold(true);
