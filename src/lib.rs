@@ -27,6 +27,7 @@ impl Plugin for EconomyPlugin {
             version: env!("CARGO_PKG_VERSION").into(),
             authors: vec!["Concelare".into()],
             description: "Concelare Economy plugin for managing player balances and transactions.".into(),
+            dependencies: vec![],
         }
     }
 
