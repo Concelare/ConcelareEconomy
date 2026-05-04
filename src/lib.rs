@@ -28,6 +28,7 @@ impl Plugin for EconomyPlugin {
             authors: vec!["Concelare".into()],
             description: "Concelare Economy plugin for managing player balances and transactions.".into(),
             dependencies: vec![],
+            permissions: vec!["fs.read.data".to_string(), "fs.write.data".to_string()],
         }
     }
 
